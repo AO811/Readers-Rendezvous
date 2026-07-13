@@ -1,0 +1,108 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation schemas
+    function isValidUser(user) {
+      return user.keys().hasAll(['id', 'username', 'email', 'createdAt', 'passwordHash']) &&
+             user.keys().size() <= 7 &&
+             user.id is string && user.id.size() <= 128 &&
+             user.username is string && user.username.size() <= 100 &&
+             user.email is string && user.email.size() <= 150 &&
+             user.createdAt is string &&
+             user.passwordHash is string;
+    }
+
+    function isValidStory(story) {
+      return story.keys().hasAll(['id', 'userId', 'username', 'title', 'genre', 'content', 'createdAt']) &&
+             story.keys().size() <= 11 &&
+             story.id is string && story.id.size() <= 128 &&
+             story.userId is string && story.userId.size() <= 128 &&
+             story.username is string && story.username.size() <= 100 &&
+             story.title is string && story.title.size() <= 200 &&
+             story.genre is string && story.genre.size() <= 50 &&
+             story.content is string && story.content.size() <= 50000 &&
+             story.createdAt is string;
+    }
+
+    function isValidConnection(conn) {
+      return conn.keys().hasAll([
+        'id', 'user1Id', 'user2Id', 'user1StoryId', 'user2StoryId',
+        'user1Username', 'user2Username', 'user1StoryTitle', 'user2StoryTitle',
+        'matchedTheme', 'matchedReason', 'icebreaker', 'matchScore', 'createdAt'
+      ]) &&
+      conn.keys().size() <= 16 &&
+      conn.id is string && conn.id.size() <= 128 &&
+      conn.user1Id is string && conn.user1Id.size() <= 128 &&
+      conn.user2Id is string && conn.user2Id.size() <= 128 &&
+      conn.matchedTheme is string && conn.matchedTheme.size() <= 200 &&
+      conn.matchScore is int && conn.matchScore >= 0 && conn.matchScore <= 100 &&
+      conn.createdAt is string;
+    }
+
+    function isValidMessage(msg) {
+      return msg.keys().hasAll(['id', 'connectionId', 'senderId', 'senderName', 'text', 'createdAt']) &&
+             msg.keys().size() <= 8 &&
+             msg.id is string && msg.id.size() <= 128 &&
+             msg.connectionId is string && msg.connectionId.size() <= 128 &&
+             msg.senderId is string && msg.senderId.size() <= 128 &&
+             msg.senderName is string && msg.senderName.size() <= 100 &&
+             msg.text is string && msg.text.size() <= 5000 &&
+             msg.createdAt is string;
+    }
+
+    // 2. Users Collection Rules
+    match /users/{userId} {
+      allow get, list: if true;
+      allow create, update: if isValidUser(incoming());
+      allow delete: if false;
+    }
+
+    // 3. Stories Collection Rules
+    match /stories/{storyId} {
+      allow get, list: if true;
+      allow create, update: if isValidStory(incoming());
+      allow delete: if true;
+    }
+
+    // 4. Connections Collection Rules
+    match /connections/{connectionId} {
+      allow get, list: if true;
+      allow create, update: if isValidConnection(incoming());
+      allow delete: if false;
+
+      // 5. Connection Messages Subcollection Rules
+      match /messages/{messageId} {
+        allow get, list: if true;
+        allow create: if isValidMessage(incoming());
+        allow update, delete: if false;
+      }
+    }
+  }
+}

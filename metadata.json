@@ -1,0 +1,6 @@
+{
+  "name": "Reader's Rendezvous",
+  "description": "A social storytelling platform where users connect through matched stories and shared private chats.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,216 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with alias, email, biography, and credentials",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "bio": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "passwordHash": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "username",
+        "email",
+        "createdAt",
+        "passwordHash"
+      ]
+    },
+    "Story": {
+      "title": "Story",
+      "description": "A story published by an author",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "userAvatar": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "matchedStoryId": {
+          "type": "string"
+        },
+        "matchedUserId": {
+          "type": "string"
+        },
+        "connectionId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "username",
+        "title",
+        "genre",
+        "content",
+        "createdAt"
+      ]
+    },
+    "Connection": {
+      "title": "Connection",
+      "description": "A literary match between two authors",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "user1Id": {
+          "type": "string"
+        },
+        "user2Id": {
+          "type": "string"
+        },
+        "user1StoryId": {
+          "type": "string"
+        },
+        "user2StoryId": {
+          "type": "string"
+        },
+        "user1Username": {
+          "type": "string"
+        },
+        "user2Username": {
+          "type": "string"
+        },
+        "user1Avatar": {
+          "type": "string"
+        },
+        "user2Avatar": {
+          "type": "string"
+        },
+        "user1StoryTitle": {
+          "type": "string"
+        },
+        "user2StoryTitle": {
+          "type": "string"
+        },
+        "matchedTheme": {
+          "type": "string"
+        },
+        "matchedReason": {
+          "type": "string"
+        },
+        "icebreaker": {
+          "type": "string"
+        },
+        "matchScore": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "user1Id",
+        "user2Id",
+        "user1StoryId",
+        "user2StoryId",
+        "user1Username",
+        "user2Username",
+        "user1StoryTitle",
+        "user2StoryTitle",
+        "matchedTheme",
+        "matchedReason",
+        "icebreaker",
+        "matchScore",
+        "createdAt"
+      ]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A message sent in a private rendezvous chat room",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "connectionId": {
+          "type": "string"
+        },
+        "senderId": {
+          "type": "string"
+        },
+        "senderName": {
+          "type": "string"
+        },
+        "senderAvatar": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "isSystem": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "connectionId",
+        "senderId",
+        "senderName",
+        "text",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Registered authors and reader profiles"
+    },
+    "stories/{storyId}": {
+      "schema": "Story",
+      "description": "Stories and manuscripts published to the public wall"
+    },
+    "connections/{connectionId}": {
+      "schema": "Connection",
+      "description": "Deep literary matches between users and/or demo AI authors"
+    },
+    "connections/{connectionId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages and system-generated prompts within a connection"
+    }
+  }
+}
